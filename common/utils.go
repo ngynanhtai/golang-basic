@@ -1,12 +1,13 @@
 package common
 
 func filterAny[T any](arr []T, f func(T) bool) []T {
-	for i, v := range arr {
+	var newArr []T
+	for _, v := range arr {
 		if f(v) {
-			return arr[i:]
+			newArr = append(newArr, v)
 		}
 	}
-	return arr
+	return newArr
 }
 
 func mapAny[T any](arr []T, f func(T) T) []T {

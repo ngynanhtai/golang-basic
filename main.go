@@ -4,34 +4,30 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-demo/common"
+	"go-demo/initializers"
 	"go-demo/middleware"
 	ginItem "go-demo/modules/item/transport/gin"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"log"
-	"os"
 )
 
+func init() {
+	initializers.LoadEnvVariables()
+	initializers.ConnectToDb()
+	initializers.SyncDatabase()
+}
+
 func main() {
-	dsn := os.Getenv("DB_CONNECTION")
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-
 	r := gin.Default()
 	r.Use(middleware.Recovery())
 	v1 := r.Group("/v1")
 	{
 		items := v1.Group("/items")
 		{
-			items.POST("", ginItem.CreateItem(db))
-			items.GET("", ginItem.ListItem(db))
-			items.GET("/:id", ginItem.GetItem(db))
-			items.PATCH("/:id", ginItem.UpdateItem(db))
-			items.DELETE("/:id", ginItem.DeleteItem(db))
+			items.POST("", ginItem.CreateItem(initializers.DB))
+			items.GET("", ginItem.ListItem(initializers.DB))
+			items.GET("/:id", ginItem.GetItem(initializers.DB))
+			items.PATCH("/:id", ginItem.UpdateItem(initializers.DB))
+			items.DELETE("/:id", ginItem.DeleteItem(initializers.DB))
 		}
 	}
 
@@ -45,7 +41,7 @@ func main() {
 		})
 	})
 
-	err = r.Run(":3000")
+	err := r.Run(":3000")
 	if err != nil {
 		log.Fatalln(err)
 		return
