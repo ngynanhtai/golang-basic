@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-demo/common"
+	"go-demo/controllers"
 	"go-demo/initializers"
 	"go-demo/middleware"
 	ginItem "go-demo/modules/item/transport/gin"
@@ -13,7 +14,6 @@ import (
 func init() {
 	initializers.LoadEnvVariables()
 	initializers.ConnectToDb()
-	initializers.SyncDatabase()
 }
 
 func main() {
@@ -29,6 +29,8 @@ func main() {
 			items.PATCH("/:id", ginItem.UpdateItem(initializers.DB))
 			items.DELETE("/:id", ginItem.DeleteItem(initializers.DB))
 		}
+		v1.POST("/sign-up", controllers.SignUp(initializers.DB))
+		v1.POST("/login", controllers.Login(initializers.DB))
 	}
 
 	r.GET("/ping", func(c *gin.Context) {
