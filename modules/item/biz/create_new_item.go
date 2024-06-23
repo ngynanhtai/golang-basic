@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"go-demo/common"
 	"go-demo/modules/item/model"
 	"strings"
 )
@@ -26,7 +27,7 @@ func (biz *CreateItemBiz) CreateItem(ctx context.Context, data *model.TodoItemCr
 	}
 
 	if err := biz.store.CreateItem(ctx, data); err != nil {
-		return err
+		return common.ErrCannotCreateEntity(model.EntityName, err)
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"go-demo/common"
 	"go-demo/modules/item/model"
 )
 
@@ -13,7 +14,7 @@ func (sql *SqlStore) DeleteItem(ctx context.Context, condition map[string]interf
 		Updates(map[string]interface{}{
 			"status": deletedStatus.String(),
 		}).Error; err != nil {
-		return err
+		return common.ErrDB(err)
 	}
 	return nil
 }

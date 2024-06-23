@@ -2,6 +2,8 @@ package biz
 
 import (
 	"context"
+	"errors"
+	"go-demo/common"
 	"go-demo/modules/item/model"
 )
 
@@ -22,15 +24,18 @@ func (biz *UpdateItemBiz) UpdateItemById(ctx context.Context, id int, dataUpdate
 	data, err := biz.store.GetItem(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
-		return err
+		if errors.Is(err, common.RecordNotFound) {
+			return common.ErrCannotGetEntity(model.EntityName, err)
+		}
+		return common.ErrCannotUpdateEntity(model.EntityName, err)
 	}
 
 	if data.Status != nil && *data.Status == model.ItemStatusDeleted {
-		return model.ErrItemIsDeleted
+		return common.ErrEntityDeleted(model.EntityName, model.ErrItemIsDeleted)
 	}
 
 	if err := biz.store.UpdateItem(ctx, map[string]interface{}{"id": id}, dataUpdate); err != nil {
-		return err
+		return common.ErrCannotUpdateEntity(model.EntityName, err)
 	}
 
 	return nil

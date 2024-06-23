@@ -14,10 +14,7 @@ func DeleteItem(db *gorm.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
+			c.JSON(http.StatusBadRequest, common.ErrInvalidRequest(err))
 			return
 		}
 
@@ -25,10 +22,7 @@ func DeleteItem(db *gorm.DB) func(*gin.Context) {
 		business := biz.NewDeleteItemBiz(store)
 
 		if err := business.DeleteItemById(c.Request.Context(), id); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 

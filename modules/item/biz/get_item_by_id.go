@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"go-demo/common"
 	"go-demo/modules/item/model"
 )
 
@@ -20,7 +21,7 @@ func NewGetItemBiz(store GetItemStorage) *GetItemBiz {
 func (biz *GetItemBiz) GetItemById(ctx context.Context, id int) (*model.TodoItem, error) {
 	data, err := biz.store.GetItem(ctx, map[string]interface{}{"id": id})
 	if err != nil {
-		return nil, err
+		return nil, common.ErrCannotGetEntity(model.EntityName, err)
 	}
 
 	return data, nil
