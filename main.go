@@ -7,7 +7,6 @@ import (
 	"go-demo/controllers"
 	"go-demo/initializers"
 	"go-demo/middleware"
-	ginItem "go-demo/modules/item/transport/gin"
 	"log"
 )
 
@@ -21,13 +20,13 @@ func main() {
 	r.Use(middleware.Recovery())
 	v1 := r.Group("/v1")
 	{
-		items := v1.Group("/items")
+		items := v1.Group("/items", middleware.RequireAuth())
 		{
-			items.POST("", ginItem.CreateItem(initializers.DB))
-			items.GET("", ginItem.ListItem(initializers.DB))
-			items.GET("/:id", ginItem.GetItem(initializers.DB))
-			items.PATCH("/:id", ginItem.UpdateItem(initializers.DB))
-			items.DELETE("/:id", ginItem.DeleteItem(initializers.DB))
+			items.POST("", controllers.CreateItem(initializers.DB))
+			items.GET("", controllers.ListItem(initializers.DB))
+			items.GET("/:id", controllers.GetItem(initializers.DB))
+			items.PATCH("/:id", controllers.UpdateItem(initializers.DB))
+			items.DELETE("/:id", controllers.DeleteItem(initializers.DB))
 		}
 		v1.POST("/sign-up", controllers.SignUp(initializers.DB))
 		v1.POST("/login", controllers.Login(initializers.DB))

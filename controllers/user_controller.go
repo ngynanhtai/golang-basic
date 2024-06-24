@@ -1,12 +1,11 @@
 package controllers
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"go-demo/biz"
 	"go-demo/common"
-	"go-demo/models"
+	"go-demo/models/user"
 	"go-demo/storage"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -17,7 +16,7 @@ import (
 
 func SignUp(db *gorm.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
-		var data models.UserCreation
+		var data user.UserCreation
 
 		if err := c.ShouldBind(&data); err != nil {
 			c.JSON(http.StatusBadRequest, common.ErrInvalidRequest(err))
@@ -38,8 +37,8 @@ func SignUp(db *gorm.DB) func(*gin.Context) {
 
 func Login(db *gorm.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
-		var data models.UserCreation
-		var entity *models.User
+		var data user.UserCreation
+		var entity *user.User
 
 		if err := c.ShouldBind(&data); err != nil {
 			c.JSON(http.StatusBadRequest, common.ErrInvalidRequest(err))
@@ -57,7 +56,7 @@ func Login(db *gorm.DB) func(*gin.Context) {
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(entity.Password), []byte(data.Password)); err != nil {
-			c.JSON(http.StatusBadRequest, common.ErrInvalidRequest(errors.New(common.ErrLoginFailed)))
+			c.JSON(http.StatusBadRequest, common.ErrInvalidRequest(common.ErrLoginFailed))
 			return
 		}
 
@@ -72,8 +71,10 @@ func Login(db *gorm.DB) func(*gin.Context) {
 			return
 		}
 
+		c.SetSameSite(http.SameSiteLaxMode)
+		c.SetCookie("Authorization", tokenJwt, 3600, "", "", false, true)
 		c.JSON(http.StatusOK, gin.H{
-			"accessToken": tokenJwt,
+			"login": true,
 		})
 	}
 }
